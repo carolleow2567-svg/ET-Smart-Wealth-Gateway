@@ -2,8 +2,10 @@ import { useState } from "react";
 import { Link } from "@tanstack/react-router";
 
 const navItems = [
-  { label: "My Portfolio", to: "/" as const },
-  { label: "e-KYC Setup", to: "/kyc" as const },
+  { label: "User Administration", to: "/" as const },
+  { label: "Bursa Data Entry", to: "/bursa-data" as const },
+  { label: "Staging Analytics Review", to: "/staging" as const },
+  { label: "Deployment Release Control", to: "/deployment" as const },
 ];
 
 export default function NavigationBar() {
@@ -17,19 +19,24 @@ export default function NavigationBar() {
           {/* Brand */}
           <div className="flex items-center gap-3">
             <div className="h-9 w-9 rounded-lg bg-emerald-500 flex items-center justify-center font-extrabold text-[#0B192C]">
-              T
+              ET
             </div>
-            <span className="text-lg font-bold tracking-tight">TreasuryHub</span>
+            <div className="leading-tight">
+              <span className="block text-lg font-bold tracking-tight">Smart Wealth Gateway</span>
+              <span className="block text-[10px] uppercase tracking-widest text-slate-400">
+                Internal Staff Console
+              </span>
+            </div>
           </div>
 
           {/* Primary navigation */}
-          <nav className="hidden md:flex items-center gap-2">
+          <nav className="hidden lg:flex items-center gap-1">
             {navItems.map((item) => (
               <Link
                 key={item.to}
                 to={item.to}
                 activeOptions={{ exact: item.to === "/" }}
-                className="rounded-md px-4 py-2 text-sm font-semibold text-slate-200 transition-colors hover:bg-slate-800 data-[status=active]:bg-emerald-500 data-[status=active]:text-[#0B192C]"
+                className="rounded-md px-3 py-2 text-sm font-semibold text-slate-200 transition-colors hover:bg-slate-800 data-[status=active]:bg-emerald-500 data-[status=active]:text-[#0B192C]"
               >
                 {item.label}
               </Link>
@@ -51,19 +58,19 @@ export default function NavigationBar() {
               onClick={() => setLoginOpen((v) => !v)}
               className="rounded-md bg-emerald-500 px-4 py-2 text-sm font-bold text-[#0B192C] hover:bg-emerald-400 transition-colors"
             >
-              Login
+              Staff Login
             </button>
           </div>
         </div>
 
-        {/* Mobile nav */}
-        <nav className="flex md:hidden items-center gap-2 pb-3">
+        {/* Mobile / tablet nav */}
+        <nav className="flex lg:hidden items-center gap-1 overflow-x-auto pb-3">
           {navItems.map((item) => (
             <Link
               key={item.to}
               to={item.to}
               activeOptions={{ exact: item.to === "/" }}
-              className="flex-1 text-center rounded-md px-3 py-2 text-sm font-semibold text-slate-200 transition-colors hover:bg-slate-800 data-[status=active]:bg-emerald-500 data-[status=active]:text-[#0B192C]"
+              className="whitespace-nowrap rounded-md px-3 py-2 text-xs font-semibold text-slate-200 transition-colors hover:bg-slate-800 data-[status=active]:bg-emerald-500 data-[status=active]:text-[#0B192C]"
             >
               {item.label}
             </Link>
@@ -78,7 +85,7 @@ export default function NavigationBar() {
             <input
               autoFocus
               type="text"
-              placeholder="Search accounts, transactions, reports..."
+              placeholder="Search users, submissions, releases..."
               className="w-full rounded-md bg-slate-800 px-4 py-2 text-sm text-white placeholder-slate-400 outline-none ring-emerald-500 focus:ring-2"
             />
           </div>
@@ -90,7 +97,7 @@ export default function NavigationBar() {
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4">
           <div className="w-full max-w-sm rounded-xl bg-[#0B192C] border border-slate-700 p-6 shadow-2xl">
             <div className="flex items-center justify-between mb-4">
-              <h2 className="text-lg font-bold">Sign in</h2>
+              <h2 className="text-lg font-bold">Staff Sign in</h2>
               <button onClick={() => setLoginOpen(false)} className="text-slate-400 hover:text-white" aria-label="Close">
                 ✕
               </button>
@@ -98,7 +105,7 @@ export default function NavigationBar() {
             <div className="space-y-3">
               <input
                 type="email"
-                placeholder="Email"
+                placeholder="Corporate email"
                 className="w-full rounded-md bg-slate-800 px-3 py-2 text-sm text-white placeholder-slate-400 outline-none ring-emerald-500 focus:ring-2"
               />
               <input
@@ -107,17 +114,12 @@ export default function NavigationBar() {
                 className="w-full rounded-md bg-slate-800 px-3 py-2 text-sm text-white placeholder-slate-400 outline-none ring-emerald-500 focus:ring-2"
               />
               <button className="w-full rounded-md bg-emerald-500 px-4 py-2 text-sm font-bold text-[#0B192C] hover:bg-emerald-400 transition-colors">
-                Sign in
+                Authenticate
               </button>
             </div>
-            <div className="mt-4 grid grid-cols-2 gap-2">
-              <button className="bg-orange-600/20 hover:bg-orange-600/30 text-orange-400 text-xs font-bold py-2 rounded border border-orange-500/30">
-                Metamask
-              </button>
-              <button className="bg-blue-600/20 hover:bg-blue-600/30 text-blue-400 text-xs font-bold py-2 rounded border border-blue-500/30">
-                Wallet Connect
-              </button>
-            </div>
+            <p className="mt-4 text-center text-[11px] text-slate-500">
+              Authorized personnel only · ET Smart Wealth Gateway
+            </p>
           </div>
         </div>
       )}

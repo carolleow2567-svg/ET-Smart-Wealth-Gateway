@@ -9,12 +9,24 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as KycRouteImport } from './routes/kyc'
+import { Route as StagingRouteImport } from './routes/staging'
+import { Route as DeploymentRouteImport } from './routes/deployment'
+import { Route as BursaDataRouteImport } from './routes/bursa-data'
 import { Route as IndexRouteImport } from './routes/index'
 
-const KycRoute = KycRouteImport.update({
-  id: '/kyc',
-  path: '/kyc',
+const StagingRoute = StagingRouteImport.update({
+  id: '/staging',
+  path: '/staging',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DeploymentRoute = DeploymentRouteImport.update({
+  id: '/deployment',
+  path: '/deployment',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const BursaDataRoute = BursaDataRouteImport.update({
+  id: '/bursa-data',
+  path: '/bursa-data',
   getParentRoute: () => rootRouteImport,
 } as any)
 const IndexRoute = IndexRouteImport.update({
@@ -25,37 +37,59 @@ const IndexRoute = IndexRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
-  '/kyc': typeof KycRoute
+  '/bursa-data': typeof BursaDataRoute
+  '/deployment': typeof DeploymentRoute
+  '/staging': typeof StagingRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
-  '/kyc': typeof KycRoute
+  '/bursa-data': typeof BursaDataRoute
+  '/deployment': typeof DeploymentRoute
+  '/staging': typeof StagingRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
-  '/kyc': typeof KycRoute
+  '/bursa-data': typeof BursaDataRoute
+  '/deployment': typeof DeploymentRoute
+  '/staging': typeof StagingRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/kyc'
+  fullPaths: '/' | '/bursa-data' | '/deployment' | '/staging'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/kyc'
-  id: '__root__' | '/' | '/kyc'
+  to: '/' | '/bursa-data' | '/deployment' | '/staging'
+  id: '__root__' | '/' | '/bursa-data' | '/deployment' | '/staging'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
-  KycRoute: typeof KycRoute
+  BursaDataRoute: typeof BursaDataRoute
+  DeploymentRoute: typeof DeploymentRoute
+  StagingRoute: typeof StagingRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/kyc': {
-      id: '/kyc'
-      path: '/kyc'
-      fullPath: '/kyc'
-      preLoaderRoute: typeof KycRouteImport
+    '/staging': {
+      id: '/staging'
+      path: '/staging'
+      fullPath: '/staging'
+      preLoaderRoute: typeof StagingRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/deployment': {
+      id: '/deployment'
+      path: '/deployment'
+      fullPath: '/deployment'
+      preLoaderRoute: typeof DeploymentRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/bursa-data': {
+      id: '/bursa-data'
+      path: '/bursa-data'
+      fullPath: '/bursa-data'
+      preLoaderRoute: typeof BursaDataRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/': {
@@ -70,7 +104,9 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
-  KycRoute: KycRoute,
+  BursaDataRoute: BursaDataRoute,
+  DeploymentRoute: DeploymentRoute,
+  StagingRoute: StagingRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
