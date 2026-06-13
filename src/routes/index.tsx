@@ -1,14 +1,14 @@
 import { createFileRoute } from "@tanstack/react-router";
-import SMECorporateTreasuryHub from "../components/SMECorporateTreasuryHub";
+import UserAdministration from "../components/UserAdministration";
 
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "My Portfolio — SME Corporate Treasury Hub" },
-      { name: "description", content: "Real-time overview of your corporate accounts, liquidity, and treasury." },
-      { property: "og:title", content: "My Portfolio — SME Corporate Treasury Hub" },
-      { property: "og:description", content: "Real-time overview of your corporate accounts, liquidity, and treasury." },
+      { title: "User Administration — ET Smart Wealth Gateway" },
+      { name: "description", content: "Provision staff accounts and govern module access across the Smart Wealth Gateway." },
+      { property: "og:title", content: "User Administration — ET Smart Wealth Gateway" },
+      { property: "og:description", content: "Provision staff accounts and govern module access across the Smart Wealth Gateway." },
     ],
   }),
-  component: SMECorporateTreasuryHub,
+  component: UserAdministration,
 });
