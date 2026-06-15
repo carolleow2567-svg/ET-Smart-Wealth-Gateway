@@ -10,6 +10,8 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as StagingRouteImport } from './routes/staging'
+import { Route as LogincopyRouteImport } from './routes/login copy'
+import { Route as LoginRouteImport } from './routes/login'
 import { Route as DeploymentRouteImport } from './routes/deployment'
 import { Route as BursaDataRouteImport } from './routes/bursa-data'
 import { Route as IndexRouteImport } from './routes/index'
@@ -17,6 +19,16 @@ import { Route as IndexRouteImport } from './routes/index'
 const StagingRoute = StagingRouteImport.update({
   id: '/staging',
   path: '/staging',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LogincopyRoute = LogincopyRouteImport.update({
+  id: '/login copy',
+  path: '/login copy',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LoginRoute = LoginRouteImport.update({
+  id: '/login',
+  path: '/login',
   getParentRoute: () => rootRouteImport,
 } as any)
 const DeploymentRoute = DeploymentRouteImport.update({
@@ -39,12 +51,16 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/bursa-data': typeof BursaDataRoute
   '/deployment': typeof DeploymentRoute
+  '/login': typeof LoginRoute
+  '/login copy': typeof LogincopyRoute
   '/staging': typeof StagingRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/bursa-data': typeof BursaDataRoute
   '/deployment': typeof DeploymentRoute
+  '/login': typeof LoginRoute
+  '/login copy': typeof LogincopyRoute
   '/staging': typeof StagingRoute
 }
 export interface FileRoutesById {
@@ -52,20 +68,43 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/bursa-data': typeof BursaDataRoute
   '/deployment': typeof DeploymentRoute
+  '/login': typeof LoginRoute
+  '/login copy': typeof LogincopyRoute
   '/staging': typeof StagingRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/bursa-data' | '/deployment' | '/staging'
+  fullPaths:
+    | '/'
+    | '/bursa-data'
+    | '/deployment'
+    | '/login'
+    | '/login copy'
+    | '/staging'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/bursa-data' | '/deployment' | '/staging'
-  id: '__root__' | '/' | '/bursa-data' | '/deployment' | '/staging'
+  to:
+    | '/'
+    | '/bursa-data'
+    | '/deployment'
+    | '/login'
+    | '/login copy'
+    | '/staging'
+  id:
+    | '__root__'
+    | '/'
+    | '/bursa-data'
+    | '/deployment'
+    | '/login'
+    | '/login copy'
+    | '/staging'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   BursaDataRoute: typeof BursaDataRoute
   DeploymentRoute: typeof DeploymentRoute
+  LoginRoute: typeof LoginRoute
+  LogincopyRoute: typeof LogincopyRoute
   StagingRoute: typeof StagingRoute
 }
 
@@ -76,6 +115,20 @@ declare module '@tanstack/react-router' {
       path: '/staging'
       fullPath: '/staging'
       preLoaderRoute: typeof StagingRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/login copy': {
+      id: '/login copy'
+      path: '/login copy'
+      fullPath: '/login copy'
+      preLoaderRoute: typeof LogincopyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/login': {
+      id: '/login'
+      path: '/login'
+      fullPath: '/login'
+      preLoaderRoute: typeof LoginRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/deployment': {
@@ -106,8 +159,20 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   BursaDataRoute: BursaDataRoute,
   DeploymentRoute: DeploymentRoute,
+  LoginRoute: LoginRoute,
+  LogincopyRoute: LogincopyRoute,
   StagingRoute: StagingRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}

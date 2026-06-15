@@ -4,9 +4,11 @@ import {
   Link,
   createRootRouteWithContext,
   useRouter,
+  useLocation,
   HeadContent,
   Scripts,
 } from "@tanstack/react-router";
+import { isAuthenticated } from "../lib/auth";
 import { useEffect, type ReactNode } from "react";
 
 import appCss from "../styles.css?url";
@@ -116,10 +118,20 @@ function RootShell({ children }: { children: ReactNode }) {
 
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
+  const router = useRouter();
+  const location = useLocation();
+
+  const isLoginPage = location.pathname === "/login";
+
+  useEffect(() => {
+    if (!isAuthenticated() && !isLoginPage) {
+      router.navigate({ to: "/login" });
+    }
+  }, [router, isLoginPage]);
 
   return (
     <QueryClientProvider client={queryClient}>
-      <NavigationBar />
+      <NavigationBar minimal={isLoginPage} />
       {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
       <Outlet />
     </QueryClientProvider>

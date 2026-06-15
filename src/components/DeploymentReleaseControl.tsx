@@ -1,10 +1,26 @@
+import { useState } from "react";
 import ModuleShell, { StatCard, Panel, StatusBadge } from "./ModuleShell";
+import {
+  useRecordControls,
+  FilterChips,
+  SearchInput,
+  SortControl,
+  PaginationBar,
+  Toolbar,
+} from "./records/tableControls";
 
 const releases = [
-  { tag: "v4.12.0", env: "Production", gate: "approved" as const, sign: "M. Lee", date: "2026-06-12" },
-  { tag: "v4.13.0-rc1", env: "Pre-Prod", gate: "pending" as const, sign: "—", date: "2026-06-13" },
-  { tag: "v4.11.4", env: "Production", gate: "approved" as const, sign: "D. Wong", date: "2026-06-09" },
-  { tag: "v4.13.0-rc0", env: "Pre-Prod", gate: "rejected" as const, sign: "M. Lee", date: "2026-06-11" },
+  { tag: "v4.12.0", env: "Production", gate: "Approved", sign: "M. Lee", date: "2026-06-12" },
+  { tag: "v4.13.0-rc1", env: "Pre-Prod", gate: "Pending", sign: "—", date: "2026-06-13" },
+  { tag: "v4.11.4", env: "Production", gate: "Approved", sign: "D. Wong", date: "2026-06-09" },
+  { tag: "v4.13.0-rc0", env: "Pre-Prod", gate: "Rejected", sign: "M. Lee", date: "2026-06-11" },
+  { tag: "v4.11.3", env: "Production", gate: "Approved", sign: "D. Wong", date: "2026-06-05" },
+  { tag: "v4.11.2-rc2", env: "Pre-Prod", gate: "Rejected", sign: "W. Tan", date: "2026-06-03" },
+  { tag: "v4.11.2", env: "Production", gate: "Approved", sign: "M. Lee", date: "2026-06-01" },
+  { tag: "v4.12.1-rc1", env: "Pre-Prod", gate: "Pending", sign: "—", date: "2026-06-13" },
+  { tag: "v4.10.9", env: "Production", gate: "Approved", sign: "D. Wong", date: "2026-05-28" },
+  { tag: "v4.10.8-rc1", env: "Pre-Prod", gate: "Pending", sign: "—", date: "2026-05-26" },
+  { tag: "v4.10.7", env: "Production", gate: "Approved", sign: "W. Tan", date: "2026-05-22" },
 ];
 
 const gates = [
@@ -16,6 +32,13 @@ const gates = [
 ] as const;
 
 export default function DeploymentReleaseControl() {
+  const ctrl = useRecordControls(releases, {
+    searchKeys: (r) => [r.tag, r.env, r.sign, r.gate],
+    status: (r) => r.gate,
+    date: (r) => r.date,
+    name: (r) => r.tag,
+  });
+
   return (
     <ModuleShell
       process="Processes 4.0 & 5.0 — Gatekeeping Mechanism"
@@ -23,15 +46,36 @@ export default function DeploymentReleaseControl() {
       subtitle="Final gatekeeping authority over releases — enforce sign-offs and promote builds from pre-prod to production."
     >
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-        <StatCard label="Awaiting Gate" value="1" hint="Release candidates" />
-        <StatCard label="Approved (30d)" value="9" hint="Promoted to prod" />
-        <StatCard label="Blocked" value="2" hint="Failed gate checks" />
-        <StatCard label="Mean Lead Time" value="2.4d" hint="Entry → production" />
+        <StatCard label="Total Builds" value={String(ctrl.counts.All)} hint="Matching current search" />
+        <StatCard label="Awaiting Gate" value={String(ctrl.counts.Pending ?? 0)} hint="Release candidates" />
+        <StatCard label="Approved" value={String(ctrl.counts.Approved ?? 0)} hint="Promoted to prod" />
+        <StatCard label="Blocked" value={String(ctrl.counts.Rejected ?? 0)} hint="Failed gate checks" />
       </div>
 
       <div className="grid lg:grid-cols-3 gap-6">
         <div className="lg:col-span-2">
           <Panel title="Release Pipeline">
+            <Toolbar>
+              <FilterChips
+                statuses={ctrl.statuses}
+                counts={ctrl.counts}
+                active={ctrl.statusFilter}
+                onChange={ctrl.setStatusFilter}
+              />
+              <SearchInput
+                value={ctrl.search}
+                onChange={ctrl.setSearch}
+                placeholder="Build, environment, sign-off..."
+              />
+            </Toolbar>
+            <div className="mb-3">
+              <SortControl
+                sortKey={ctrl.sortKey}
+                sortDir={ctrl.sortDir}
+                onSort={ctrl.setSort}
+                withName={false}
+              />
+            </div>
             <div className="overflow-x-auto">
               <table className="w-full text-sm">
                 <thead>
@@ -44,18 +88,37 @@ export default function DeploymentReleaseControl() {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-800">
-                  {releases.map((r) => (
+                  {ctrl.view.map((r) => (
                     <tr key={r.tag} className="text-slate-200">
                       <td className="py-3 pr-4 font-mono text-xs">{r.tag}</td>
                       <td className="py-3 pr-4 text-slate-400">{r.env}</td>
                       <td className="py-3 pr-4 text-slate-400">{r.sign}</td>
                       <td className="py-3 pr-4 text-slate-400">{r.date}</td>
-                      <td className="py-3"><StatusBadge status={r.gate} /></td>
+                      <td className="py-3">
+                        <StatusBadge status={r.gate.toLowerCase() as "approved" | "pending" | "rejected"} />
+                      </td>
                     </tr>
                   ))}
+                  {ctrl.view.length === 0 && (
+                    <tr>
+                      <td colSpan={5} className="py-8 text-center text-sm text-slate-500">
+                        No builds match your filters.
+                      </td>
+                    </tr>
+                  )}
                 </tbody>
               </table>
             </div>
+            <PaginationBar
+              rangeStart={ctrl.rangeStart}
+              rangeEnd={ctrl.rangeEnd}
+              total={ctrl.total}
+              page={ctrl.page}
+              pageCount={ctrl.pageCount}
+              pageSize={ctrl.pageSize}
+              onPage={ctrl.setPage}
+              onPageSize={ctrl.setPageSize}
+            />
           </Panel>
         </div>
 
