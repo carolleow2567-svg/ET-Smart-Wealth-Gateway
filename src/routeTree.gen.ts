@@ -10,15 +10,22 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as StagingRouteImport } from './routes/staging'
+import { Route as SecurityRouteImport } from './routes/security'
 import { Route as LogincopyRouteImport } from './routes/login copy'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as DeploymentRouteImport } from './routes/deployment'
 import { Route as BursaDataRouteImport } from './routes/bursa-data'
+import { Route as ApprovalsRouteImport } from './routes/approvals'
 import { Route as IndexRouteImport } from './routes/index'
 
 const StagingRoute = StagingRouteImport.update({
   id: '/staging',
   path: '/staging',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SecurityRoute = SecurityRouteImport.update({
+  id: '/security',
+  path: '/security',
   getParentRoute: () => rootRouteImport,
 } as any)
 const LogincopyRoute = LogincopyRouteImport.update({
@@ -41,6 +48,11 @@ const BursaDataRoute = BursaDataRouteImport.update({
   path: '/bursa-data',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApprovalsRoute = ApprovalsRouteImport.update({
+  id: '/approvals',
+  path: '/approvals',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
@@ -49,62 +61,76 @@ const IndexRoute = IndexRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/approvals': typeof ApprovalsRoute
   '/bursa-data': typeof BursaDataRoute
   '/deployment': typeof DeploymentRoute
   '/login': typeof LoginRoute
   '/login copy': typeof LogincopyRoute
+  '/security': typeof SecurityRoute
   '/staging': typeof StagingRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/approvals': typeof ApprovalsRoute
   '/bursa-data': typeof BursaDataRoute
   '/deployment': typeof DeploymentRoute
   '/login': typeof LoginRoute
   '/login copy': typeof LogincopyRoute
+  '/security': typeof SecurityRoute
   '/staging': typeof StagingRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/approvals': typeof ApprovalsRoute
   '/bursa-data': typeof BursaDataRoute
   '/deployment': typeof DeploymentRoute
   '/login': typeof LoginRoute
   '/login copy': typeof LogincopyRoute
+  '/security': typeof SecurityRoute
   '/staging': typeof StagingRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/approvals'
     | '/bursa-data'
     | '/deployment'
     | '/login'
     | '/login copy'
+    | '/security'
     | '/staging'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/approvals'
     | '/bursa-data'
     | '/deployment'
     | '/login'
     | '/login copy'
+    | '/security'
     | '/staging'
   id:
     | '__root__'
     | '/'
+    | '/approvals'
     | '/bursa-data'
     | '/deployment'
     | '/login'
     | '/login copy'
+    | '/security'
     | '/staging'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  ApprovalsRoute: typeof ApprovalsRoute
   BursaDataRoute: typeof BursaDataRoute
   DeploymentRoute: typeof DeploymentRoute
   LoginRoute: typeof LoginRoute
   LogincopyRoute: typeof LogincopyRoute
+  SecurityRoute: typeof SecurityRoute
   StagingRoute: typeof StagingRoute
 }
 
@@ -115,6 +141,13 @@ declare module '@tanstack/react-router' {
       path: '/staging'
       fullPath: '/staging'
       preLoaderRoute: typeof StagingRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/security': {
+      id: '/security'
+      path: '/security'
+      fullPath: '/security'
+      preLoaderRoute: typeof SecurityRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/login copy': {
@@ -145,6 +178,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof BursaDataRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/approvals': {
+      id: '/approvals'
+      path: '/approvals'
+      fullPath: '/approvals'
+      preLoaderRoute: typeof ApprovalsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/': {
       id: '/'
       path: '/'
@@ -157,10 +197,12 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  ApprovalsRoute: ApprovalsRoute,
   BursaDataRoute: BursaDataRoute,
   DeploymentRoute: DeploymentRoute,
   LoginRoute: LoginRoute,
   LogincopyRoute: LogincopyRoute,
+  SecurityRoute: SecurityRoute,
   StagingRoute: StagingRoute,
 }
 export const routeTree = rootRouteImport

@@ -8,6 +8,7 @@ import {
   PaginationBar,
   Toolbar,
 } from "./records/tableControls";
+import { approvalService } from "../lib/api/approvals";
 
 type RecordStatus = "Pending" | "Approved" | "Rejected";
 
@@ -360,7 +361,9 @@ function validateForm(form: FormState): Partial<Record<keyof FormState, string>>
 }
 
 export default function BursaDataEntry() {
-  const ctrl = useRecordControls(records, {
+  const [dynamicRecords, setDynamicRecords] = useState<FinancialRecord[]>([...records]);
+
+  const ctrl = useRecordControls(dynamicRecords, {
     searchKeys: (r) => [r.company, r.bursaCode, r.reportId, r.financialYear, r.createdBy],
     status: (r) => r.status,
     date: (r) => r.submissionDate,
@@ -371,19 +374,44 @@ export default function BursaDataEntry() {
   const [form, setForm] = useState<FormState>(emptyForm);
   const [errors, setErrors] = useState<Partial<Record<keyof FormState, string>>>({});
   const [submitted, setSubmitted] = useState(false);
+  const [successMsg, setSuccessMsg] = useState<string | null>(null);
 
   const setField = (key: keyof FormState, value: string) => {
     setForm((f) => ({ ...f, [key]: value }));
     if (submitted) setErrors(validateForm({ ...form, [key]: value }));
   };
 
+  const nextReportId = dynamicRecords.length + 1;
+
   const handleSubmit = () => {
     const errs = validateForm(form);
     setErrors(errs);
     setSubmitted(true);
     if (Object.keys(errs).length === 0) {
+      const newRecord: FinancialRecord = {
+        reportId: `RPT-2026-${String(nextReportId).padStart(3, "0")}`,
+        company: form.company.trim(),
+        bursaCode: form.bursaCode.trim(),
+        financialYear: form.financialYear.trim(),
+        revenue: Number(form.revenue),
+        netProfit: Number(form.netProfit),
+        eps: Number(form.eps),
+        pat: Number(form.pat),
+        createdBy: "Current User",
+        submissionDate: new Date().toISOString().slice(0, 10),
+        status: "Pending",
+        history: [
+          { stage: "Draft", user: "Current User", department: "Bursa Operations", date: new Date().toISOString().slice(0, 10), action: "Created draft", notes: "" },
+          { stage: "Pending", user: "Current User", department: "Bursa Operations", date: new Date().toISOString().slice(0, 10), action: "Submitted for validation", notes: "Awaiting data verification" },
+        ],
+      };
+      setDynamicRecords((prev) => [newRecord, ...prev]);
       setForm(emptyForm);
       setSubmitted(false);
+      // Push into the Approval Management pipeline
+      approvalService.submitFromBursa(newRecord.company, newRecord.reportId, "Current User");
+      setSuccessMsg(`${newRecord.company} (${newRecord.reportId}) submitted successfully. Now in Approval Management queue.`);
+      setTimeout(() => setSuccessMsg(null), 4000);
     }
   };
 
@@ -393,6 +421,13 @@ export default function BursaDataEntry() {
       title="Bursa Data Entry"
       subtitle="Capture and validate Bursa Malaysia financial data before it is promoted to the staging environment."
     >
+      {/* Success message */}
+      {successMsg && (
+        <div className="mb-4 rounded-md border border-emerald-500/30 bg-emerald-500/15 px-4 py-3 text-sm text-emerald-300">
+          {successMsg}
+        </div>
+      )}
+
       {/* Filter-aware summary cards */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
         <StatCard label="Total Records" value={String(ctrl.counts.All)} hint="Matching current search" />
